@@ -32,7 +32,7 @@ type NumberStream = BoxStream<'static, Result<i32, FieldError>>;
 impl Subscription {
     async fn count() -> NumberStream {
         let mut value = 0;
-        let stream = IntervalStream::new(interval(Duration::from_secs(1))).map(move |_| {
+        let stream = StreamExt::map(IntervalStream::new(interval(Duration::from_secs(1))), move |_| {
             value += 1;
             Ok(value)
         });
@@ -71,7 +71,7 @@ async fn main() {
     .route("/", get(homepage))
     .layer(Extension(Arc::new(schema)));
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
     let listener = TcpListener::bind(addr)
     .await
     .unwrap_or_else(|e| panic!("failed to listen on {addr}: {e}"));
